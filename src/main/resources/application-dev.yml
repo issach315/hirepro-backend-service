@@ -1,4 +1,3 @@
-# application-dev.yml - Development Environment
 spring:
   config:
     activate:
@@ -16,26 +15,17 @@ spring:
       idle-timeout: 300000
       max-lifetime: 600000
       pool-name: HikariCP-Dev
-      leak-detection-threshold: 60000
 
   jpa:
     hibernate:
-      ddl-auto: update  # Auto update schema in development
-    show-sql: ${SHOW_SQL:true}
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        hbm2ddl:
-          auto: update
+      ddl-auto: update
+    show-sql: true
 
-# Development-specific settings
 server:
   error:
     include-stacktrace: always
     include-exception: true
 
-# CORS configuration for development
 app:
   environment: development
   cors:
@@ -45,7 +35,6 @@ app:
     allow-credentials: true
     max-age: 3600
 
-# Logging
 logging:
   level:
     root: INFO
@@ -53,20 +42,3 @@ logging:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.jdbc.core: DEBUG
-  file:
-    name: logs/hirepro-dev.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 7
-
-# Actuator - more permissive in dev
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always

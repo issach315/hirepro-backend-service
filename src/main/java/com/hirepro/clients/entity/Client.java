@@ -10,10 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "client", indexes = {
-        @Index(name = "idx_client_email", columnList = "client_email"),
-        @Index(name = "idx_client_name", columnList = "client_name")
-})
+@Table(name = "client")
 public class Client {
 
     @Id
