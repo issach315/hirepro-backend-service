@@ -17,7 +17,7 @@ RUN ./mvnw dependency:go-offline
 COPY src src
 
 # Build JAR
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 # =========================
 # Runtime stage
