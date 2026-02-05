@@ -1,11 +1,88 @@
+# application-prod.yml - Production Environment
 spring:
+  config:
+    activate:
+      on-profile: prod
+
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?useSSL=true&serverTimezone=UTC
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://${PROD_DB_HOST}:${PROD_DB_PORT:3306}/${PROD_DB_NAME}?useSSL=true&requireSSL=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&autoReconnect=true&maxReconnects=3&initialTimeout=2
+    username: ${PROD_DB_USERNAME}
+    password: ${PROD_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: HikariCP-Prod
+      leak-detection-threshold: 120000
+      connection-test-query: SELECT 1
 
   jpa:
     hibernate:
-      ddl-auto: ${HIBERNATE_DDL_AUTO:validate}
+      ddl-auto: validate  # Never auto-update in production
     show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        hbm2ddl:
+          auto: validate
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        query:
+          in_clause_parameter_padding: true
+
+# Production server settings
+server:
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: always
+  shutdown: graceful
+  forward-headers-strategy: native
+
+# CORS configuration for production
+app:
+  environment: production
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://yourdomain.com,https://www.yourdomain.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: Content-Type,Authorization,X-Requested-With
+    allow-credentials: true
+    max-age: 3600
+
+# Logging - production level
+logging:
+  level:
+    root: WARN
+    com.hirepro: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+  file:
+    name: logs/hirepro-prod.log
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 30
+      total-size-cap: 1GB
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator - restricted in production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
