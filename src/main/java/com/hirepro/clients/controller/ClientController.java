@@ -2,6 +2,7 @@ package com.hirepro.clients.controller;
 
 import com.hirepro.clients.entity.Client;
 import com.hirepro.clients.service.ClientService;
+import com.hirepro.clients.service.ClientServiceImpl;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class ClientController {
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 
     @Autowired
-    private ClientService clientService;
+    private ClientServiceImpl clientService;
 
     @Value("${app.environment:unknown}")
     private String environment;
