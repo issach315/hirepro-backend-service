@@ -12,29 +12,19 @@ import java.util.Optional;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    /**
-     * Find clients by name containing the given string (case-insensitive)
-     */
+    // Find clients by name containing the given string (case-insensitive)
     List<Client> findByClientNameContainingIgnoreCase(String name);
 
-    /**
-     * Find client by exact email
-     */
+    // Find client by exact email
     Optional<Client> findByClientEmail(String email);
 
-    /**
-     * Find clients by industry
-     */
+    // Find clients by industry
     List<Client> findByIndustry(String industry);
 
-    /**
-     * Find clients by location
-     */
+    // Find clients by location
     List<Client> findByClientLocation(String location);
 
-    /**
-     * Custom query to search clients by multiple fields
-     */
+    // Custom query to search clients by multiple fields
     @Query("SELECT c FROM Client c WHERE " +
             "LOWER(c.clientName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(c.clientEmail) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
@@ -42,13 +32,9 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             "LOWER(c.clientLocation) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<Client> searchClients(@Param("searchTerm") String searchTerm);
 
-    /**
-     * Check if client exists by email
-     */
+    // Check if client exists by email
     boolean existsByClientEmail(String email);
 
-    /**
-     * Count clients by industry
-     */
+    // Count clients by industry
     long countByIndustry(String industry);
 }

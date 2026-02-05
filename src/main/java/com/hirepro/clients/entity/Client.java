@@ -10,7 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "client")
+@Table(name = "clients")
 public class Client {
 
     @Id
@@ -25,7 +25,7 @@ public class Client {
     @NotBlank(message = "Client email is required")
     @Email(message = "Email should be valid")
     @Size(max = 255, message = "Email must not exceed 255 characters")
-    @Column(name = "client_email", nullable = false)
+    @Column(name = "client_email", nullable = false, unique = true)
     private String clientEmail;
 
     @Size(max = 255, message = "Location must not exceed 255 characters")
@@ -52,11 +52,10 @@ public class Client {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Default constructor
+    // Constructors
     public Client() {
     }
 
-    // Constructor without ID and timestamps
     public Client(String clientName, String clientEmail, String clientLocation,
                   String clientPhone, String industry, String contactPerson) {
         this.clientName = clientName;
