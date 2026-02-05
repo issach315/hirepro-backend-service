@@ -40,7 +40,7 @@ public class ClientController {
 
     // ============ CREATE CLIENT ============
     @PostMapping("/addClient")
-    public ResponseEntity<Client> createClient(@Valid @RequestBody Client client) {
+    public ResponseEntity<Client> createClient( @RequestBody Client client) {
         logger.info("Creating new client: {}", client.getClientName());
         try {
             Client savedClient = clientService.saveClient(client);
