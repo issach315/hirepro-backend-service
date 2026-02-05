@@ -38,8 +38,8 @@ public class ClientController {
         return ResponseEntity.ok(response);
     }
 
-    // Create
-    @PostMapping
+    // ============ CREATE CLIENT ============
+    @PostMapping("/addClient")
     public ResponseEntity<Client> createClient(@Valid @RequestBody Client client) {
         logger.info("Creating new client: {}", client.getClientName());
         try {
@@ -52,8 +52,14 @@ public class ClientController {
         }
     }
 
-    // Read All
+    // ============ GET ALL CLIENTS (RESTful style) ============
     @GetMapping
+    public ResponseEntity<List<Client>> getAllClientsRest() {
+        return getAllClients();
+    }
+
+    // ============ GET ALL CLIENTS (Explicit style) ============
+    @GetMapping("/getAllClients")
     public ResponseEntity<List<Client>> getAllClients() {
         logger.info("Fetching all clients");
         List<Client> clients = clientService.getAllClients();
@@ -61,8 +67,14 @@ public class ClientController {
         return ResponseEntity.ok(clients);
     }
 
-    // Read by ID
+    // ============ GET CLIENT BY ID (RESTful style) ============
     @GetMapping("/{id}")
+    public ResponseEntity<Client> getClientByIdRest(@PathVariable Long id) {
+        return getClientById(id);
+    }
+
+    // ============ GET CLIENT BY ID (Explicit style) ============
+    @GetMapping("/getClientById/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable Long id) {
         logger.info("Fetching client with ID: {}", id);
         return clientService.getClientById(id)
@@ -76,8 +88,8 @@ public class ClientController {
                 });
     }
 
-    // Update
-    @PutMapping("/{id}")
+    // ============ UPDATE CLIENT (FULL UPDATE) ============
+    @PutMapping("/updateClient/{id}")
     public ResponseEntity<Client> updateClient(@PathVariable Long id, @Valid @RequestBody Client client) {
         logger.info("Updating client with ID: {}", id);
         try {
@@ -90,8 +102,8 @@ public class ClientController {
         }
     }
 
-    // Patch (Partial Update)
-    @PatchMapping("/{id}")
+    // ============ PATCH CLIENT (PARTIAL UPDATE) ============
+    @PatchMapping("/patchClient/{id}")
     public ResponseEntity<Client> patchClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         logger.info("Patching client with ID: {}", id);
         try {
@@ -104,8 +116,8 @@ public class ClientController {
         }
     }
 
-    // Delete
-    @DeleteMapping("/{id}")
+    // ============ DELETE CLIENT ============
+    @DeleteMapping("/deleteClient/{id}")
     public ResponseEntity<Map<String, String>> deleteClient(@PathVariable Long id) {
         logger.info("Deleting client with ID: {}", id);
         try {
@@ -121,8 +133,8 @@ public class ClientController {
         }
     }
 
-    // Search by name
-    @GetMapping("/search")
+    // ============ SEARCH CLIENTS BY NAME ============
+    @GetMapping("/searchClients")
     public ResponseEntity<List<Client>> searchClients(@RequestParam String name) {
         logger.info("Searching clients with name containing: {}", name);
         List<Client> clients = clientService.searchClientsByName(name);
@@ -130,8 +142,8 @@ public class ClientController {
         return ResponseEntity.ok(clients);
     }
 
-    // Count
-    @GetMapping("/count")
+    // ============ GET CLIENT COUNT ============
+    @GetMapping("/getClientCount")
     public ResponseEntity<Map<String, Long>> getClientCount() {
         logger.info("Counting total clients");
         long count = clientService.getClientCount();
