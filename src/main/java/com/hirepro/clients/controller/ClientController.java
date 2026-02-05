@@ -40,7 +40,7 @@ public class ClientController {
 
     // ============ CREATE CLIENT ============
     @PostMapping("/addClient")
-    public ResponseEntity<Client> createClient( @RequestBody Client client) {
+    public ResponseEntity<Client> createClient(@RequestBody Client client) {
         logger.info("Creating new client: {}", client.getClientName());
         try {
             Client savedClient = clientService.saveClient(client);
@@ -52,13 +52,7 @@ public class ClientController {
         }
     }
 
-    // ============ GET ALL CLIENTS (RESTful style) ============
-    @GetMapping
-    public ResponseEntity<List<Client>> getAllClientsRest() {
-        return getAllClients();
-    }
-
-    // ============ GET ALL CLIENTS (Explicit style) ============
+    // ============ GET ALL CLIENTS (Explicit style) - MUST BE BEFORE /{id} ============
     @GetMapping("/getAllClients")
     public ResponseEntity<List<Client>> getAllClients() {
         logger.info("Fetching all clients");
@@ -67,13 +61,7 @@ public class ClientController {
         return ResponseEntity.ok(clients);
     }
 
-    // ============ GET CLIENT BY ID (RESTful style) ============
-    @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientByIdRest(@PathVariable Long id) {
-        return getClientById(id);
-    }
-
-    // ============ GET CLIENT BY ID (Explicit style) ============
+    // ============ GET CLIENT BY ID (Explicit style) - MUST BE BEFORE /{id} ============
     @GetMapping("/getClientById/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable Long id) {
         logger.info("Fetching client with ID: {}", id);
@@ -86,6 +74,26 @@ public class ClientController {
                     logger.warn("Client not found with ID: {}", id);
                     return ResponseEntity.notFound().build();
                 });
+    }
+
+    // ============ SEARCH CLIENTS BY NAME - MUST BE BEFORE /{id} ============
+    @GetMapping("/searchClients")
+    public ResponseEntity<List<Client>> searchClients(@RequestParam String name) {
+        logger.info("Searching clients with name containing: {}", name);
+        List<Client> clients = clientService.searchClientsByName(name);
+        logger.info("Found {} clients matching search criteria", clients.size());
+        return ResponseEntity.ok(clients);
+    }
+
+    // ============ GET CLIENT COUNT - MUST BE BEFORE /{id} ============
+    @GetMapping("/getClientCount")
+    public ResponseEntity<Map<String, Long>> getClientCount() {
+        logger.info("Counting total clients");
+        long count = clientService.getClientCount();
+        Map<String, Long> response = new HashMap<>();
+        response.put("count", count);
+        logger.info("Total clients: {}", count);
+        return ResponseEntity.ok(response);
     }
 
     // ============ UPDATE CLIENT (FULL UPDATE) ============
@@ -133,23 +141,15 @@ public class ClientController {
         }
     }
 
-    // ============ SEARCH CLIENTS BY NAME ============
-    @GetMapping("/searchClients")
-    public ResponseEntity<List<Client>> searchClients(@RequestParam String name) {
-        logger.info("Searching clients with name containing: {}", name);
-        List<Client> clients = clientService.searchClientsByName(name);
-        logger.info("Found {} clients matching search criteria", clients.size());
-        return ResponseEntity.ok(clients);
+    // ============ GET ALL CLIENTS (RESTful style) - KEEP AT END ============
+    @GetMapping
+    public ResponseEntity<List<Client>> getAllClientsRest() {
+        return getAllClients();
     }
 
-    // ============ GET CLIENT COUNT ============
-    @GetMapping("/getClientCount")
-    public ResponseEntity<Map<String, Long>> getClientCount() {
-        logger.info("Counting total clients");
-        long count = clientService.getClientCount();
-        Map<String, Long> response = new HashMap<>();
-        response.put("count", count);
-        logger.info("Total clients: {}", count);
-        return ResponseEntity.ok(response);
+    // ============ GET CLIENT BY ID (RESTful style) - KEEP AT END ============
+    @GetMapping("/{id}")
+    public ResponseEntity<Client> getClientByIdRest(@PathVariable Long id) {
+        return getClientById(id);
     }
 }
