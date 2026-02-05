@@ -1,32 +1,67 @@
 package com.hirepro.clients.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "client")
+@Table(name = "client", indexes = {
+        @Index(name = "idx_client_email", columnList = "client_email"),
+        @Index(name = "idx_client_name", columnList = "client_name")
+})
 public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Client name is required")
+    @Size(max = 255, message = "Client name must not exceed 255 characters")
+    @Column(name = "client_name", nullable = false)
     private String clientName;
+
+    @NotBlank(message = "Client email is required")
+    @Email(message = "Email should be valid")
+    @Size(max = 255, message = "Email must not exceed 255 characters")
+    @Column(name = "client_email", nullable = false)
     private String clientEmail;
+
+    @Size(max = 255, message = "Location must not exceed 255 characters")
+    @Column(name = "client_location")
     private String clientLocation;
+
+    @Size(max = 50, message = "Phone must not exceed 50 characters")
+    @Column(name = "client_phone", length = 50)
     private String clientPhone;
+
+    @Size(max = 255, message = "Industry must not exceed 255 characters")
+    @Column(name = "industry")
     private String industry;
+
+    @Size(max = 255, message = "Contact person must not exceed 255 characters")
+    @Column(name = "contact_person")
     private String contactPerson;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     // Default constructor
     public Client() {
     }
 
-    // All-args constructor
-    public Client(String clientName, String clientEmail, String clientLocation, String clientPhone, String industry, String contactPerson) {
+    // Constructor without ID and timestamps
+    public Client(String clientName, String clientEmail, String clientLocation,
+                  String clientPhone, String industry, String contactPerson) {
         this.clientName = clientName;
         this.clientEmail = clientEmail;
         this.clientLocation = clientLocation;
@@ -92,6 +127,22 @@ public class Client {
         this.contactPerson = contactPerson;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     @Override
     public String toString() {
         return "Client{" +
@@ -102,6 +153,8 @@ public class Client {
                 ", clientPhone='" + clientPhone + '\'' +
                 ", industry='" + industry + '\'' +
                 ", contactPerson='" + contactPerson + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
