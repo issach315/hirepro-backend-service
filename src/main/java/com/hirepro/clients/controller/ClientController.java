@@ -2,7 +2,6 @@ package com.hirepro.clients.controller;
 
 import com.hirepro.clients.entity.Client;
 import com.hirepro.clients.service.ClientService;
-import com.hirepro.clients.service.ClientServiceImpl;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,17 +17,18 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/clients")
+@CrossOrigin(origins = "*")
 public class ClientController {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 
     @Autowired
-    private ClientServiceImpl clientService;
+    private ClientService clientService;
 
     @Value("${app.environment:unknown}")
     private String environment;
 
-    // Health check endpoint
+    // ============ HEALTH CHECK ============
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         Map<String, String> response = new HashMap<>();
@@ -39,21 +39,16 @@ public class ClientController {
     }
 
     // ============ CREATE CLIENT ============
-    @PostMapping("/addClient")
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
+    @PostMapping
+    public ResponseEntity<Client> createClient(@Valid @RequestBody Client client) {
         logger.info("Creating new client: {}", client.getClientName());
-        try {
-            Client savedClient = clientService.saveClient(client);
-            logger.info("Client created successfully with ID: {}", savedClient.getId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
-        } catch (Exception e) {
-            logger.error("Error creating client: {}", e.getMessage(), e);
-            throw e;
-        }
+        Client savedClient = clientService.saveClient(client);
+        logger.info("Client created successfully with ID: {}", savedClient.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedClient);
     }
 
-    // ============ GET ALL CLIENTS (Explicit style) - MUST BE BEFORE /{id} ============
-    @GetMapping("/getAllClients")
+    // ============ GET ALL CLIENTS ============
+    @GetMapping
     public ResponseEntity<List<Client>> getAllClients() {
         logger.info("Fetching all clients");
         List<Client> clients = clientService.getAllClients();
@@ -61,8 +56,8 @@ public class ClientController {
         return ResponseEntity.ok(clients);
     }
 
-    // ============ GET CLIENT BY ID (Explicit style) - MUST BE BEFORE /{id} ============
-    @GetMapping("/getClientById/{id}")
+    // ============ GET CLIENT BY ID ============
+    @GetMapping("/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable Long id) {
         logger.info("Fetching client with ID: {}", id);
         return clientService.getClientById(id)
@@ -76,8 +71,38 @@ public class ClientController {
                 });
     }
 
-    // ============ SEARCH CLIENTS BY NAME - MUST BE BEFORE /{id} ============
-    @GetMapping("/searchClients")
+    // ============ UPDATE CLIENT (FULL) ============
+    @PutMapping("/{id}")
+    public ResponseEntity<Client> updateClient(@PathVariable Long id, @Valid @RequestBody Client client) {
+        logger.info("Updating client with ID: {}", id);
+        Client updatedClient = clientService.updateClient(id, client);
+        logger.info("Client updated successfully: {}", updatedClient.getClientName());
+        return ResponseEntity.ok(updatedClient);
+    }
+
+    // ============ PARTIAL UPDATE CLIENT ============
+    @PatchMapping("/{id}")
+    public ResponseEntity<Client> patchClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+        logger.info("Patching client with ID: {}", id);
+        Client patchedClient = clientService.patchClient(id, updates);
+        logger.info("Client patched successfully");
+        return ResponseEntity.ok(patchedClient);
+    }
+
+    // ============ DELETE CLIENT ============
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteClient(@PathVariable Long id) {
+        logger.info("Deleting client with ID: {}", id);
+        clientService.deleteClient(id);
+        logger.info("Client deleted successfully with ID: {}", id);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Client deleted successfully");
+        response.put("id", id.toString());
+        return ResponseEntity.ok(response);
+    }
+
+    // ============ SEARCH CLIENTS ============
+    @GetMapping("/search")
     public ResponseEntity<List<Client>> searchClients(@RequestParam String name) {
         logger.info("Searching clients with name containing: {}", name);
         List<Client> clients = clientService.searchClientsByName(name);
@@ -85,8 +110,8 @@ public class ClientController {
         return ResponseEntity.ok(clients);
     }
 
-    // ============ GET CLIENT COUNT - MUST BE BEFORE /{id} ============
-    @GetMapping("/getClientCount")
+    // ============ GET CLIENT COUNT ============
+    @GetMapping("/count")
     public ResponseEntity<Map<String, Long>> getClientCount() {
         logger.info("Counting total clients");
         long count = clientService.getClientCount();
@@ -94,62 +119,5 @@ public class ClientController {
         response.put("count", count);
         logger.info("Total clients: {}", count);
         return ResponseEntity.ok(response);
-    }
-
-    // ============ UPDATE CLIENT (FULL UPDATE) ============
-    @PutMapping("/updateClient/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id, @Valid @RequestBody Client client) {
-        logger.info("Updating client with ID: {}", id);
-        try {
-            Client updatedClient = clientService.updateClient(id, client);
-            logger.info("Client updated successfully: {}", updatedClient.getClientName());
-            return ResponseEntity.ok(updatedClient);
-        } catch (RuntimeException e) {
-            logger.error("Error updating client with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // ============ PATCH CLIENT (PARTIAL UPDATE) ============
-    @PatchMapping("/patchClient/{id}")
-    public ResponseEntity<Client> patchClient(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        logger.info("Patching client with ID: {}", id);
-        try {
-            Client patchedClient = clientService.patchClient(id, updates);
-            logger.info("Client patched successfully");
-            return ResponseEntity.ok(patchedClient);
-        } catch (RuntimeException e) {
-            logger.error("Error patching client with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // ============ DELETE CLIENT ============
-    @DeleteMapping("/deleteClient/{id}")
-    public ResponseEntity<Map<String, String>> deleteClient(@PathVariable Long id) {
-        logger.info("Deleting client with ID: {}", id);
-        try {
-            clientService.deleteClient(id);
-            logger.info("Client deleted successfully with ID: {}", id);
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Client deleted successfully");
-            response.put("id", id.toString());
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            logger.error("Error deleting client with ID {}: {}", id, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // ============ GET ALL CLIENTS (RESTful style) - KEEP AT END ============
-    @GetMapping
-    public ResponseEntity<List<Client>> getAllClientsRest() {
-        return getAllClients();
-    }
-
-    // ============ GET CLIENT BY ID (RESTful style) - KEEP AT END ============
-    @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientByIdRest(@PathVariable Long id) {
-        return getClientById(id);
     }
 }

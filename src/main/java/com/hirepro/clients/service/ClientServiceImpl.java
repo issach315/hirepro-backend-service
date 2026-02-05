@@ -1,6 +1,7 @@
 package com.hirepro.clients.service;
 
 import com.hirepro.clients.entity.Client;
+import com.hirepro.clients.exception.ClientNotFoundException;
 import com.hirepro.clients.repository.ClientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +53,7 @@ public class ClientServiceImpl implements ClientService {
             existingClient.setIndustry(client.getIndustry());
             existingClient.setContactPerson(client.getContactPerson());
             return clientRepository.save(existingClient);
-        }).orElseThrow(() -> {
-            logger.error("Client not found with id: {}", id);
-            return new RuntimeException("Client not found with id " + id);
-        });
+        }).orElseThrow(() -> new ClientNotFoundException("Client not found with id " + id));
     }
 
     @Override
@@ -87,18 +85,14 @@ public class ClientServiceImpl implements ClientService {
                 }
             });
             return clientRepository.save(existingClient);
-        }).orElseThrow(() -> {
-            logger.error("Client not found with id: {}", id);
-            return new RuntimeException("Client not found with id " + id);
-        });
+        }).orElseThrow(() -> new ClientNotFoundException("Client not found with id " + id));
     }
 
     @Override
     public void deleteClient(Long id) {
         logger.debug("Deleting client with ID: {}", id);
         if (!clientRepository.existsById(id)) {
-            logger.error("Client not found with id: {}", id);
-            throw new RuntimeException("Client not found with id " + id);
+            throw new ClientNotFoundException("Client not found with id " + id);
         }
         clientRepository.deleteById(id);
     }
