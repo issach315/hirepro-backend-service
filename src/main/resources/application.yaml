@@ -1,4 +1,3 @@
-# application.yml - Base Configuration
 spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
@@ -6,12 +5,10 @@ spring:
   application:
     name: hirepro-clients
 
-  # Common JPA settings
   jpa:
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         jdbc:
           time_zone: UTC
@@ -20,7 +17,6 @@ spring:
         order_updates: true
         generate_statistics: false
 
-# Server configuration
 server:
   port: ${PORT:8080}
   servlet:
@@ -34,25 +30,23 @@ server:
     include-stacktrace: never
     include-exception: false
 
-# Actuator endpoints
 management:
   endpoints:
     web:
-      exposure:
-        include: health,info,metrics,prometheus
       base-path: /actuator
+      exposure:
+        include: health,info,metrics
   endpoint:
     health:
-      show-details: when-authorized
       probes:
         enabled: true
+      show-details: when-authorized
   health:
     livenessstate:
       enabled: true
     readinessstate:
       enabled: true
 
-# Logging
 logging:
   level:
     root: INFO
@@ -61,9 +55,7 @@ logging:
     org.hibernate: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Application info
 info:
   app:
     name: HirePro Clients Service
