@@ -1,20 +1,33 @@
-# Use Java 17
-FROM eclipse-temurin:17-jdk-alpine
+# =========================
+# Build stage
+# =========================
+FROM eclipse-temurin:17-jdk-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy Maven wrapper and project files
-COPY . .
+# Copy Maven wrapper + config first (for caching)
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
 
-# Make mvnw executable
 RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
 
-# Build the project
+# Copy source code
+COPY src src
+
+# Build JAR
 RUN ./mvnw clean package -DskipTests
 
-# Expose port
+# =========================
+# Runtime stage
+# =========================
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the Spring Boot app
-CMD ["java", "-jar", "target/hirepro-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
