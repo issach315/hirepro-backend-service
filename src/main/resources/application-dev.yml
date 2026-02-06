@@ -42,3 +42,11 @@ logging:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+
+jwt:
+  secret: ${JWT_SECRET:change-this-to-a-very-long-secure-secret-key-at-least-32-chars}
+  access-token:
+    expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}      # 15 minutes (ms)
+  refresh-token:
+    expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}  # 7 days (ms)

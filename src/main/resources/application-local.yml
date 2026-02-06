@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: hirepro-backend-service
+
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/hirepro_db
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: HikariCP-Local
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  sql:
+    init:
+      mode: never
+
+  data:
+    jpa:
+      repositories:
+        enabled: true
+
+# ===============================
+# JWT CONFIGURATION
+# ===============================
+jwt:
+  secret: "local-HirePro-JWT-Secret-256bit-Change-This"
+  access-token-expiration: 900000       # 15 minutes (ms)
+  refresh-token-expiration: 604800000    # 7 days (ms)
+
+# ===============================
+# SERVER CONFIG
+# ===============================
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# ===============================
+# LOGGING (useful for auth debugging)
+# ===============================
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.hirepro.auth: DEBUG
