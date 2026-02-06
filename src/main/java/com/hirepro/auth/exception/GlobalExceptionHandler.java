@@ -1,4 +1,4 @@
-package com.hirepro.auth.exception.;
+package com.hirepro.auth.exception;
 
 import com.hirepro.auth.dto.ApiResponse;
 import lombok.extern.slf4j.Slf4j;

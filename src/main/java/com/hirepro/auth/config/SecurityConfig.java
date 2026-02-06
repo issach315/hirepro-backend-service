@@ -40,11 +40,18 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints
                         .requestMatchers("/auth/register", "/auth/login", "/auth/refresh").permitAll()
+
+                        // Role-based URL security
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/superadmin/**").hasRole("SUPERADMIN")
-                        .requestMatchers("/teamlead/**")
-                        .hasAnyRole("TEAMLEAD", "ADMIN", "SUPERADMIN")
+                        .requestMatchers("/teamlead/**").hasAnyRole("TEAMLEAD", "ADMIN", "SUPERADMIN")
+
+                        // User management endpoints
+                        .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SUPERADMIN", "TEAMLEAD")
+
+                        // Any other request must be authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
@@ -58,6 +65,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     // -------- Authentication Provider --------
 
