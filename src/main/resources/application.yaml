@@ -61,3 +61,9 @@ info:
     name: HirePro Clients Service
     description: Client Management Microservice
     version: 1.0.0
+jwt:
+  secret: ${JWT_SECRET:change-this-to-a-very-long-secure-secret-key-at-least-32-chars}
+  access-token:
+    expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}      # 15 minutes (ms)
+  refresh-token:
+    expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}  # 7 days (ms)
